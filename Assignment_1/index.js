@@ -2,6 +2,7 @@
 
 
 
+const my_db=require("./DB_Api.js");
 
 
 var express=require('express');
@@ -15,6 +16,9 @@ app.use(bodyParser.json());
 var dt=JSON.parse(fs.readFileSync('./data.json'));
 var arr=dt.users;
 var _id=(dt.length === 0)?0:arr[arr.length-1].id;
+
+
+
 
 
 app.post('/api/users', (req, res) => {
@@ -38,6 +42,20 @@ app.post('/api/users', (req, res) => {
 
 })
 
+app.post('/db/api/users', (req, res) => {
+	
+	const data = req.body;
+
+    _name=data.name;
+    _address=data.address;
+    user={
+        "name":_name,
+        "address":_address
+    }
+    my_db.insert_user(user,req,res);
+
+})
+
 
 app.get('/users',(req,res)=>
 {
@@ -45,6 +63,18 @@ app.get('/users',(req,res)=>
     var users=dt.users;
     res.send(users);
 })
+
+app.get('/db/users',(req,res)=>
+{
+    my_db.get_users(req,res);
+})
+
+app.get('/db/users1',(req,res)=>
+{
+    console.log(db_id);
+    res.send("P");
+})
+
 
 app.get('/api/users/:id',(req,res)=>
 {
@@ -67,6 +97,14 @@ app.get('/api/users/:id',(req,res)=>
     {
         res.send({"response":"User Not Found"})
     }
+})
+
+app.get('/db/api/users/:id',(req,res)=>
+{
+    _id=req.params.id;
+    
+    my_db.search_user(_id,req,res);
+
 })
 
 app.patch('/api/users/:id',(req,res)=>
@@ -96,6 +134,21 @@ app.patch('/api/users/:id',(req,res)=>
     }
 })
 
+app.patch('/db/api/users/:id',(req,res)=>
+{
+    _id=req.params.id;
+    var data=req.body;
+    
+    _name=data.name;
+    _address=data.address;
+    user={
+        "name":_name,
+        "address":_address
+    }
+
+    my_db.update_user(_id,user,req,res);
+})
+
 app.delete('/api/users/:id',(req,res)=>
 {
     _id=req.params.id;
@@ -121,6 +174,12 @@ app.delete('/api/users/:id',(req,res)=>
     {
         res.send({"response":"User Not Found"})
     }
+})
+
+app.delete('/db/api/users/:id',(req,res)=>
+{
+    _id=req.params.id;
+    my_db.delete_user(_id,req,res);
 })
 
 
